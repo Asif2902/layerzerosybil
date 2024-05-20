@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sybil Check</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <img src="layerzero.png" alt="Logo" class="logo">
+        <p><a href="https://www.x.com/XponentialEarns"><img src="twitter.png" alt="Twitter" width="40" height="40"></a></p>
+        <h1>LayerZero Sybil Check</h1>
+        <li>You can put up to 100 addresses. More addresses mean more time to check.</li>
+        <li>Use one space or comma between addresses.</li>
+        <li>It takes 15 seconds or more.</li>
+        <input type="text" id="addressInput" placeholder="Enter your address here">
+        <button id="checkButton">Check</button>
+        <div id="resultPopup" class="popup">
+            <span id="popupMessage"></span>
+            <div class="buttons-container">
+                <button id="fillUpButton" class="hidden">Fill Up</button>
+                <img id="twitterButton" class="hidden" src="Twitter.png" alt="Twitter">
+            </div>
+        </div>
+        <div id="eligibilityPopup" class="popup">
+            <span id="eligibilityMessage"></span>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
