@@ -1,49 +1,50 @@
 document.getElementById('checkButton').addEventListener('click', function() {
-    const address = document.getElementById('addressInput').value.trim();
-    if (!address) {
-        alert('Please enter an address.');
+    const addressesInput = document.getElementById('addressInput').value.trim();
+    if (!addressesInput) {
+        alert('Please enter addresses.');
         return;
     }
 
-    fetch('sybil.zip')  
-        .then(response => response.blob())
-        .then(blob => {
-            return JSZip.loadAsync(blob);
-        })
-        .then(zip => {
-            return zip.file('sybil.txt').async('string');
-        })
-        .then(data => {
-            const addresses = data.split('\n').map(line => line.trim());
-            const isSybil = addresses.includes(address);
-            const resultPopup = document.getElementById('resultPopup');
-            const popupMessage = document.getElementById('popupMessage');
-            const fillUpButton = document.getElementById('fillUpButton');
-            const twitterButton = document.getElementById('twitterButton');
+    const addresses = addressesInput.split(/[, ]+/).slice(0, 100); // Split addresses by comma or space, limit to 100
+    const promises = addresses.map(address => {
+        return fetchAndCheckAddress(address);
+    });
 
-            resultPopup.style.display = 'block';
-
-            if (isSybil) {
-                popupMessage.textContent = 'Your address is in Sybil 😕. Please fill up the form for a investigation by LayerZero Team.';
-                fillUpButton.classList.remove('hidden');
-                twitterButton.classList.remove('hidden');
-                twitterButton.classList.add('small');
-            } else {
-                popupMessage.textContent = 'Hurray 🥳, you are not in Sybil!🎉';
-                fillUpButton.classList.add('hidden');
-                twitterButton.classList.add('hidden');
-            }
+    Promise.all(promises)
+        .then(results => {
+            displayResults(results);
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to fetch or process the ZIP file.');
+            alert('Failed to fetch or process the data.');
         });
 });
 
-document.getElementById('fillUpButton').addEventListener('click', function() {
-    window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSfdnxQvdt8QTjGODVCSnckk_f1dv_IFeaeUVXRfF__euyIZbw/viewform';
-});
+function fetchAndCheckAddress(address) {
+    return fetch('https://raw.githubusercontent.com/LayerZero-Labs/sybil-report/main/initialList.txt')
+        .then(response => response.text())
+        .then(data => {
+            const addressesList = data.split('\n').map(line => line.trim());
+            const isSybil = addressesList.includes(address);
+            return { address: formatAddress(address), isSybil };
+        });
+}
 
-document.getElementById('twitterButton').addEventListener('click', function() {
-    window.location.href = 'https://twitter.com/XponentialEarns';
-});
+function formatAddress(address) {
+    return address.replace(/^(0x\w{4}).*(\w{2})$/, '$1****$2');
+}
+
+function displayResults(results) {
+    const resultPopup = document.getElementById('resultPopup');
+    resultPopup.style.display = 'block';
+    resultPopup.innerHTML = ''; // Clear previous results
+
+    results.forEach(result => {
+        const { address, isSybil } = result;
+        const formattedAddress = formatAddress(address);
+        const addressResult = document.createElement('div');
+        addressResult.classList.add('address-result');
+        addressResult.innerHTML = `<span>${formattedAddress}</span><span>${isSybil ? '<a href="https://docs.google.com/forms/d/e/1FAIpQLSfdnxQvdt8QTjGODVCSnckk_f1dv_IFeaeUVXRfF__euyIZbw/viewform">   Sybil . Fill the Form </a>' : 'Not in Sybil'}</span>`;
+        resultPopup.appendChild(addressResult);
+    });
+}
