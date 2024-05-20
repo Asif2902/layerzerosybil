@@ -24,12 +24,12 @@ document.getElementById('checkButton').addEventListener('click', function() {
             resultPopup.style.display = 'block';
 
             if (isSybil) {
-                popupMessage.textContent = 'Your address is in Sybil. Please fill up the form for a investigation by LayerZero Team.';
+                popupMessage.textContent = 'Your address is in Sybil 😕. Please fill up the form for a investigation by LayerZero Team.';
                 fillUpButton.classList.remove('hidden');
                 twitterButton.classList.remove('hidden');
                 twitterButton.classList.add('small');
             } else {
-                popupMessage.textContent = 'Hurray, you are not in Sybil!';
+                popupMessage.textContent = 'Hurray 🥳, you are not in Sybil!🎉';
                 fillUpButton.classList.add('hidden');
                 twitterButton.classList.add('hidden');
             }
