@@ -67,15 +67,26 @@ button.hidden {
     gap: 10px; /* Adjust the gap as needed */
 }
 
-img#twitterButton {
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    margin-top: 10px;
+
+.address-result {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #ccc;
 }
 
-img#twitterButton.small {
-    width: 40px;
-    height: 40px; /* Same height as the button */
-    margin-top: 20;
+.address-result span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.address-result a {
+    color: #2196f3;
+    text-decoration: none;
+}
+
+.address-result a:hover {
+    text-decoration: underline;
 }
