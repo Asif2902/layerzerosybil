@@ -3,42 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tap-to-Unbox</title>
+    <title>TapSwap</title>
     <link rel="stylesheet" href="styles/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@1.0.0/dist/tonconnect.min.js"></script>
+    <script src="scripts/main.js" defer></script>
 </head>
 <body>
-    <div id="main-container">
-        <header>
-            <h1>TapSwap</h1>
-            <button id="connectWallet">Connect Wallet</button>
-        </header>
-
-        <section id="tap-to-unbox">
-            <img src="logo.png" alt="Coin" id="unboxButton">
-            <p>Balance: <span id="balanceDisplay">0</span></p>
-            <p>Energy: <span id="energyDisplay">500/500</span></p>
+    <header>
+        <img src="logo.png" alt="TapSwap Logo">
+    </header>
+    
+    <main>
+        <section id="tap-to-earn">
+            <img src="coin.png" alt="Tap to Earn" id="coin-img">
+            <div id="balance-display">Balance: <span id="balance">0</span></div>
+            <div id="energy-display">Energy: <span id="energy">500/500</span></div>
         </section>
 
         <section id="tasks">
-            <h2>Tasks</h2>
-            <button id="taskButton">Complete Task</button>
+            <button id="task-1" onclick="completeTask(1)">Join Telegram Group</button>
+            <button id="task-2" onclick="completeTask(2)">Watch Video</button>
+            <!-- Add more tasks as needed -->
         </section>
 
         <section id="airdrop">
-            <h2>Airdrop</h2>
-            <p>Connect your Telegram wallet to claim airdrops.</p>
-            <button id="airdropButton">Connect Telegram</button>
+            <button id="connect-ton-wallet">Connect TON Wallet</button>
         </section>
+    </main>
 
-        <footer>
-            <nav>
-                <a href="#tap-to-unbox"><i class="icon earn"></i> Earn</a>
-                <a href="#tasks"><i class="icon tasks"></i> Tasks</a>
-                <a href="#airdrop"><i class="icon airdrop"></i> Airdrop</a>
-            </nav>
-        </footer>
-    </div>
-
-    <script src="scripts/main.js"></script>
+    <footer>
+        <!-- Footer icons -->
+    </footer>
 </body>
 </html>
