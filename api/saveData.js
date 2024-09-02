@@ -1,34 +1,38 @@
-const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const app = express();
-const port = 3000;
 
-app.use(express.json());
+module.exports.saveUserData = async (req, res) => {
+    const { userId, balance, energy } = req.body;
 
-// Create the user_data directory if it doesn't exist
-const userDataDir = path.join(__dirname, 'user_data');
-if (!fs.existsSync(userDataDir)) {
-    fs.mkdirSync(userDataDir);
-}
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required.' });
+    }
 
-// Endpoint to save user data
-app.post('/save-data', (req, res) => {
-    const { tgUserId, balance, energy, walletAddress } = req.body;
+    const filePath = path.join(__dirname, '../users.txt');
 
-    const data = `User ID: ${tgUserId}\nBalance: ${balance}\nEnergy: ${energy}\nWallet: ${walletAddress}\n`;
-    
-    const filePath = path.join(userDataDir, `${tgUserId}.txt`);
-
-    fs.writeFile(filePath, data, (err) => {
+    fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
-            console.error(err);
-            return res.status(500).send('Error saving data');
+            console.error('Error reading file:', err);
+            return res.status(500).json({ error: 'Failed to save data.' });
         }
-        res.send('Data saved successfully');
-    });
-});
 
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-});
+        const users = data ? JSON.parse(data) : [];
+        const userIndex = users.findIndex(user => user.userId === userId);
+
+        if (userIndex >= 0) {
+            users[userIndex].balance = balance;
+            users[userIndex].energy = energy;
+        } else {
+            users.push({ userId, balance, energy });
+        }
+
+        fs.writeFile(filePath, JSON.stringify(users, null, 2), (err) => {
+            if (err) {
+                console.error('Error writing file:', err);
+                return res.status(500).json({ error: 'Failed to save data.' });
+            }
+
+            res.status(200).json({ success: true });
+        });
+    });
+};
