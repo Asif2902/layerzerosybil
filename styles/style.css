@@ -1,66 +1,45 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #1b1b2f;
-    color: #fff;
     text-align: center;
+    background-color: #1e1e1e;
+    color: white;
 }
 
-#main-container {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
+#app {
+    margin: 50px auto;
+    max-width: 400px;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
+h1#title {
+    font-size: 3em;
+    margin-bottom: 20px;
 }
 
-#tap-to-unbox {
-    margin-top: 20px;
+#balance-section {
+    margin-bottom: 30px;
 }
 
-#unboxButton {
+#tap-section img {
     width: 150px;
-    height: 150px;
     cursor: pointer;
+    margin-bottom: 20px;
 }
 
-footer {
+button {
+    background-color: #ffcc00;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    margin: 10px;
+    border-radius: 5px;
+    color: #1e1e1e;
+}
+
+button:hover {
+    background-color: #ffd633;
+}
+
+#airdrop-section {
     margin-top: 30px;
-}
-
-footer nav a {
-    color: #fff;
-    text-decoration: none;
-    padding: 10px;
-    font-size: 18px;
-}
-
-footer nav a i {
-    margin-right: 5px;
-}
-
-.icon {
-    width: 24px;
-    height: 24px;
-    display: inline-block;
-}
-
-.icon.earn {
-    background: url('earn-icon.png') no-repeat center;
-    background-size: cover;
-}
-
-.icon.tasks {
-    background: url('tasks-icon.png') no-repeat center;
-    background-size: cover;
-}
-
-.icon.airdrop {
-    background: url('airdrop-icon.png') no-repeat center;
-    background-size: cover;
 }
