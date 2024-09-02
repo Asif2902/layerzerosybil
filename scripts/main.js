@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const userID = 'user123'; // Example User ID, this should be dynamic
     let tokenBalance = 1000;  // Example starting balance, this should be loaded from a file
-    let energy = 1;           // Starting energy
+    let energy = 1000;           // Starting energy
     const ENERGY_REGEN_TIME = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
     // Load balance and last energy generation time from cookies
