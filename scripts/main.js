@@ -93,3 +93,26 @@ document.addEventListener('DOMContentLoaded', function() {
         return "";
     }
 });
+function saveUserData(balance, energy, walletAddress = '') {
+    const tgUserId = getCookie('tgUserId') || 'UnknownUser';
+    const data = {
+        tgUserId: tgUserId,
+        balance: balance,
+        energy: energy,
+        walletAddress: walletAddress
+    };
+
+    fetch('/save-data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then(response => {
+        return response.text();
+    }).then(data => {
+        console.log(data); // Response from server
+    }).catch(error => {
+        console.error('Error saving data:', error);
+    });
+}
