@@ -7,18 +7,38 @@
     <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
-    <div id="container">
-        <img src="assets/logo.png" alt="Logo" id="coin" />
-        <div id="tap-to-un">
-            <!-- Tap-to-Unbox section will be here -->
-        </div>
+    <div id="main-container">
+        <header>
+            <h1>TapSwap</h1>
+            <button id="connectWallet">Connect Wallet</button>
+        </header>
+
+        <section id="tap-to-unbox">
+            <img src="logo.png" alt="Coin" id="unboxButton">
+            <p>Balance: <span id="balanceDisplay">0</span></p>
+            <p>Energy: <span id="energyDisplay">500/500</span></p>
+        </section>
+
+        <section id="tasks">
+            <h2>Tasks</h2>
+            <button id="taskButton">Complete Task</button>
+        </section>
+
+        <section id="airdrop">
+            <h2>Airdrop</h2>
+            <p>Connect your Telegram wallet to claim airdrops.</p>
+            <button id="airdropButton">Connect Telegram</button>
+        </section>
+
+        <footer>
+            <nav>
+                <a href="#tap-to-unbox"><i class="icon earn"></i> Earn</a>
+                <a href="#tasks"><i class="icon tasks"></i> Tasks</a>
+                <a href="#airdrop"><i class="icon airdrop"></i> Airdrop</a>
+            </nav>
+        </footer>
     </div>
-    <div id="task-section">
-        <button id="task-button">Complete Task (5000 Coins)</button>
-    </div>
-    <div id="adopt-section">
-        <button id="adopt-button">Adopt</button>
-    </div>
+
     <script src="scripts/main.js"></script>
 </body>
 </html>
