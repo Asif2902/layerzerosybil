@@ -1,108 +1,95 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const coin = document.getElementById('coin');
-    const tapToUn = document.getElementById('tap-to-un');
-    const taskButton = document.getElementById('task-button');
-    const adoptButton = document.getElementById('adopt-button');
+    // Initial Setup
+    let balance = parseInt(getCookie('tokenBalance')) || 0;
+    let energy = parseInt(getCookie('energy')) || 500;
 
-    const userID = 'user123'; // Example User ID, this should be dynamic
-    let tokenBalance = 1000;  // Example starting balance, this should be loaded from a file
-    let energy = 1000;           // Starting energy
-    const ENERGY_REGEN_TIME = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+    document.getElementById('balanceDisplay').innerText = balance;
+    document.getElementById('energyDisplay').innerText = `${energy}/500`;
 
-    // Load balance and last energy generation time from cookies
-    const savedBalance = getCookie('tokenBalance');
-    const lastEnergyGen = getCookie('lastEnergyGenTime');
-    tokenBalance = savedBalance ? parseInt(savedBalance) : tokenBalance;
+    // Tap-to-Unbox Event
+    document.getElementById('unboxButton').addEventListener('click', function() {
+        if (energy > 0) {
+            balance += 1;
+            energy -= 1;
 
-    // Check if 12 hours have passed since the last energy generation
-    if (lastEnergyGen) {
-        const timeElapsed = Date.now() - parseInt(lastEnergyGen);
-        if (timeElapsed >= ENERGY_REGEN_TIME) {
-            energy++;
-            setCookie('lastEnergyGenTime', Date.now(), 7);
-        }
-    } else {
-        setCookie('lastEnergyGenTime', Date.now(), 7);
-    }
+            setCookie('tokenBalance', balance, 1);
+            setCookie('energy', energy, 1);
 
-    updateBalanceDisplay();
+            document.getElementById('balanceDisplay').innerText = balance;
+            document.getElementById('energyDisplay').innerText = `${energy}/500`;
 
-    // Coin click event
-    coin.addEventListener('click', function() {
-        if (tokenBalance > 0 && energy > 0) {
-            tokenBalance--;
-            energy--;
-            setCookie('tokenBalance', tokenBalance, 7);
-            setCookie('lastEnergyGenTime', Date.now(), 7); // Reset energy generation timer
-            updateBalanceDisplay();
-            saveUserData(userID, tokenBalance);
+            saveUserData(balance, energy);
         } else {
-            alert('No energy left!');
+            alert('No energy left! Wait for regeneration.');
         }
     });
 
-    // Task button event
-    taskButton.addEventListener('click', function() {
-        tokenBalance += 5000;
-        setCookie('tokenBalance', tokenBalance, 7);
-        updateBalanceDisplay();
-        saveUserData(userID, tokenBalance);
-    });
+    // Task Completion Event
+    document.getElementById('taskButton').addEventListener('click', function() {
+        if (!getCookie('taskCompleted')) {
+            balance += 5000;
 
-    // Adopt button event
-    adoptButton.addEventListener('click', function() {
-        if (isTelegramConnected()) {
-            // Implement adopt logic here
+            setCookie('tokenBalance', balance, 1);
+            setCookie('taskCompleted', true, 1);
+
+            document.getElementById('balanceDisplay').innerText = balance;
+            alert('Task completed! You earned 5,000 coins.');
         } else {
-            alert('Please connect your Telegram wallet.');
+            alert('Task already completed!');
         }
     });
 
-    // Update balance display
-    function updateBalanceDisplay() {
-        tapToUn.textContent = `Balance: ${tokenBalance}, Energy: ${energy}`;
+    // Connect Wallet Event (Mock)
+    document.getElementById('connectWallet').addEventListener('click', function() {
+        const walletAddress = "0xYourWalletAddress";
+        if (walletAddress) {
+            setCookie('walletAddress', walletAddress, 1);
+            alert('Wallet connected!');
+            saveUserData(balance, energy, walletAddress);
+        } else {
+            alert('Address not found.');
+        }
+    });
+
+    // Connect Telegram for Airdrop Event (Mock)
+    document.getElementById('airdropButton').addEventListener('click', function() {
+        const tgUserId = "12345678"; // Example Telegram User ID
+        if (tgUserId) {
+            setCookie('tgUserId', tgUserId, 1);
+            alert('Telegram connected! Ready for airdrops.');
+        } else {
+            alert('Telegram not connected.');
+        }
+    });
+
+    // Save User Data to a Text File (Server-Side Simulation)
+    function saveUserData(balance, energy, walletAddress = '') {
+        const tgUserId = getCookie('tgUserId') || 'UnknownUser';
+        const data = `User ID: ${tgUserId}\nBalance: ${balance}\nEnergy: ${energy}\nWallet: ${walletAddress}\n`;
+        console.log(data); // Replace this with an API call to save data to the server
     }
 
-    // Save user data
-    function saveUserData(id, balance) {
-        fetch('/api/saveData', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id, balance })
-        })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
-    }
-
-    // Simple cookie management functions
-    function setCookie(name, value, days) {
+    // Cookie Functions
+    function setCookie(cname, cvalue, exdays) {
         const d = new Date();
-        d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
-        const expires = "expires=" + d.toUTCString();
-        document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
 
-    function getCookie(name) {
-        const cname = name + "=";
-        const decodedCookie = decodeURIComponent(document.cookie);
-        const ca = decodedCookie.split(';');
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
         for (let i = 0; i < ca.length; i++) {
             let c = ca[i];
             while (c.charAt(0) == ' ') {
                 c = c.substring(1);
             }
-            if (c.indexOf(cname) == 0) {
-                return c.substring(cname.length, c.length);
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
             }
         }
         return "";
-    }
-
-    function isTelegramConnected() {
-        // Placeholder function, implement Telegram connection check here
-        return true;
     }
 });
