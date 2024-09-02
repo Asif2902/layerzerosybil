@@ -3,36 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TapSwap</title>
+    <title>Tap to Earn</title>
     <link rel="stylesheet" href="styles/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@1.0.0/dist/tonconnect.min.js"></script>
-    <script src="scripts/main.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" defer></script>
 </head>
 <body>
-    <header>
-        <img src="logo.png" alt="TapSwap Logo">
-    </header>
-    
-    <main>
-        <section id="tap-to-earn">
-            <img src="coin.png" alt="Tap to Earn" id="coin-img">
-            <div id="balance-display">Balance: <span id="balance">0</span></div>
-            <div id="energy-display">Energy: <span id="energy">500/500</span></div>
-        </section>
+    <div id="app">
+        <h1 id="title">TapSwap</h1>
+        <div id="balance-section">
+            <h2>Balance: <span id="balance">0</span> Coins</h2>
+            <h2>Energy: <span id="energy">500/500</span></h2>
+        </div>
+        <div id="tap-section">
+            <img id="coin" src="assets/logo.png" alt="Coin">
+        </div>
+        <div id="task-section">
+            <button id="task1" onclick="completeTask('task1')">Join Telegram</button>
+            <button id="task2" onclick="completeTask('task2')">Watch Video</button>
+        </div>
+        <div id="airdrop-section">
+            <button id="airdrop">Connect TON Wallet for Airdrop</button>
+        </div>
+    </div>
 
-        <section id="tasks">
-            <button id="task-1" onclick="completeTask(1)">Join Telegram Group</button>
-            <button id="task-2" onclick="completeTask(2)">Watch Video</button>
-            <!-- Add more tasks as needed -->
-        </section>
-
-        <section id="airdrop">
-            <button id="connect-ton-wallet">Connect TON Wallet</button>
-        </section>
-    </main>
-
-    <footer>
-        <!-- Footer icons -->
-    </footer>
+    <script src="scripts/main.js"></script>
 </body>
 </html>
