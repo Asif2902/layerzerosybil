@@ -1,21 +1,24 @@
+const express = require('express');
 const fs = require('fs');
-const path = require('path');
+const app = express();
+const port = 3000;
 
-module.exports = (req, res) => {
-    if (req.method === 'POST') {
-        const { id, balance } = req.body;
+app.use(express.json());
 
-        const data = `UserID: ${id}, Balance: ${balance}\n`;
-        const filePath = path.join(__dirname, 'userData.txt');
+app.post('/save-data', (req, res) => {
+    const { tgUserId, balance, energy, walletAddress } = req.body;
 
-        fs.appendFile(filePath, data, (err) => {
-            if (err) {
-                res.status(500).json({ error: 'Failed to save data' });
-                return;
-            }
-            res.status(200).json({ message: 'Data saved successfully' });
-        });
-    } else {
-        res.status(405).json({ error: 'Method not allowed' });
-    }
-};
+    const data = `User ID: ${tgUserId}\nBalance: ${balance}\nEnergy: ${energy}\nWallet: ${walletAddress}\n`;
+    
+    fs.writeFile(`./user_data/${tgUserId}.txt`, data, (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error saving data');
+        }
+        res.send('Data saved successfully');
+    });
+});
+
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+});
