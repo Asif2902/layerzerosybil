@@ -6,23 +6,34 @@ body {
 }
 
 #app {
-    margin: 50px auto;
+    margin: 20px auto;
     max-width: 400px;
+    padding: 10px;
 }
 
 h1#title {
-    font-size: 3em;
-    margin-bottom: 20px;
+    font-size: 2em;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#balance-section {
-    margin-bottom: 30px;
+#user-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
-#tap-section img {
-    width: 150px;
-    cursor: pointer;
-    margin-bottom: 20px;
+#user-balance {
+    display: flex;
+    align-items: center;
+}
+
+#coin-logo {
+    width: 30px;
+    margin-right: 5px;
 }
 
 button {
@@ -31,7 +42,6 @@ button {
     padding: 10px 20px;
     font-size: 1em;
     cursor: pointer;
-    margin: 10px;
     border-radius: 5px;
     color: #1e1e1e;
 }
@@ -40,6 +50,30 @@ button:hover {
     background-color: #ffd633;
 }
 
-#airdrop-section {
-    margin-top: 30px;
+#energy-section {
+    margin-bottom: 20px;
+}
+
+#earn-section img {
+    width: 100px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#nav-bar {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.nav-button {
+    background-color: transparent;
+    border: none;
+    color: #ffcc00;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.nav-button i {
+    margin-right: 5px;
 }
