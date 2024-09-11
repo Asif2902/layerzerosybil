@@ -105,12 +105,12 @@ async function completeTask(taskId, taskName) {
 
 // Task actions
 document.getElementById('follow-twitter-task').addEventListener('click', () => {
-    window.open('https://twitter.com', '_blank');
+    window.open('https://x.com/0xAsif_eth?t=sqgZeY0FifztD7eO_GSfJw&s=09', '_blank');
     completeTask('follow-twitter-task', 'Twitter Follow');
 });
 
 document.getElementById('join-telegram-task').addEventListener('click', () => {
-    window.open('https://t.me', '_blank');
+    window.open('https://t.me/asif2902', '_blank');
     completeTask('join-telegram-task', 'Telegram Join');
 });
 
