@@ -12,11 +12,12 @@ body {
 }
 
 h1#title {
-    font-size: 2em;
+    font-size: 2.2em; /* Slightly increased font size */
     margin-bottom: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-weight: bold;
 }
 
 #user-info {
@@ -32,18 +33,19 @@ h1#title {
 }
 
 #coin-logo {
-    width: 30px;
-    margin-right: 5px;
+    width: 50px; /* Increased logo size */
+    margin-right: 10px;
 }
 
 button {
     background-color: #ffcc00;
     border: none;
-    padding: 10px 20px;
-    font-size: 1em;
+    padding: 12px 25px; /* Increased padding for a bigger button */
+    font-size: 1.1em;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 8px; /* More rounded corners */
     color: #1e1e1e;
+    font-weight: bold;
 }
 
 button:hover {
@@ -55,7 +57,7 @@ button:hover {
 }
 
 #earn-section img {
-    width: 100px;
+    width: 150px; /* Increased logo size */
     cursor: pointer;
     margin-bottom: 20px;
 }
