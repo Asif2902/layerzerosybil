@@ -11,10 +11,7 @@ function getCookie(name) {
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(';');
     for(let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
+        let c = ca[i].trim();
         if (c.indexOf(cname) == 0) {
             return c.substring(cname.length, c.length);
         }
@@ -22,71 +19,70 @@ function getCookie(name) {
     return "";
 }
 
-// Load user data and cookies
-async function loadUserData() {
-    try {
-        const userId = await getTelegramUserId();
-        const response = await fetch(`/api/loadData?userId=${userId}`);
-        
-        if (!response.ok) {
-            throw new Error('Failed to load user data');
-        }
+// Function to load balance and energy from cookies or set defaults
+function loadUserDataFromCookies() {
+    let balance = getCookie('balance');
+    let energy = getCookie('energy');
 
-        const userData = await response.json();
-        
-        // Update UI with fetched data
-        if (userData) {
-            document.getElementById("balance").textContent = getCookie('balance') || userData.balance || 0;
-            document.getElementById("energy").textContent = getCookie('energy') || userData.energy || "500/500";
-        }
-    } catch (error) {
-        console.error('Error loading user data:', error);
+    if (!balance) {
+        balance = 0;  // default balance
+        setCookie('balance', balance, 7);  // set default balance in cookie
     }
+    if (!energy) {
+        energy = "500/500";  // default energy
+        setCookie('energy', energy, 7);  // set default energy in cookie
+    }
+
+    document.getElementById("balance").textContent = balance;
+    document.getElementById("energy").textContent = energy;
 }
 
-// Save user data and cookies
-async function saveUserData(balance, energy) {
-    const userId = await getTelegramUserId();
-    const data = { userId, balance, energy };
+// Save the balance and energy to cookies
+function saveUserDataToCookies(balance, energy) {
+    setCookie('balance', balance, 7);  // Save balance for 7 days
+    setCookie('energy', energy, 7);  // Save energy for 7 days
+}
 
-    try {
-        await fetch('/api/saveData', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+// Handle "Tap to Earn" functionality
+document.getElementById('coin').addEventListener('click', async () => {
+    let balance = parseInt(document.getElementById("balance").textContent, 10);
+    let energy = parseInt(document.getElementById("energy").textContent.split('/')[0], 10);
+
+    if (energy > 0) {
+        balance += 1;  // Increase balance by 1
+        energy -= 1;  // Decrease energy by 1
+
+        document.getElementById("balance").textContent = balance;
+        document.getElementById("energy").textContent = `${energy}/500`;
 
         // Save to cookies
-        setCookie('balance', balance, 7);
-        setCookie('energy', energy, 7);
-
-    } catch (error) {
-        console.error('Error saving user data:', error);
+        saveUserDataToCookies(balance, `${energy}/500`);
+    } else {
+        alert("No energy left. Please wait for regeneration.");
     }
-}
+});
 
-// Handle task completion
+// Task completion handling
 async function completeTask(taskId, taskName) {
     document.getElementById(taskId).disabled = true;
 
-    setTimeout(async () => {
+    setTimeout(() => {
         let balance = parseInt(document.getElementById("balance").textContent, 10);
-        balance += 5000;
+        balance += 5000;  // Add 5000 coins for completing the task
 
         document.getElementById("balance").textContent = balance;
-        await saveUserData(balance, parseInt(document.getElementById("energy").textContent.split('/')[0], 10));
+        saveUserDataToCookies(balance, document.getElementById("energy").textContent);
 
         alert(`${taskName} completed! 5000 coins added to balance.`);
-    }, 5000);
+    }, 5000);  // Simulate task completion after 5 seconds
 }
 
-// Follow Twitter Task
+// Task actions
 document.getElementById('follow-twitter-task').addEventListener('click', () => {
     window.open('https://twitter.com', '_blank');
     completeTask('follow-twitter-task', 'Twitter Follow');
 });
 
-// Join Telegram Task
 document.getElementById('join-telegram-task').addEventListener('click', () => {
     window.open('https://t.me', '_blank');
     completeTask('join-telegram-task', 'Telegram Join');
@@ -97,19 +93,19 @@ function startEnergyRefuelTimer() {
     let energy = parseInt(document.getElementById("energy").textContent.split('/')[0], 10);
 
     if (energy < 500) {
-        let refuelTime = 10 * 60 * 1000; // 10 minutes to refuel to full
+        let refuelTime = 10 * 60 * 1000;  // 10 minutes to refuel to full
         let timeLeft = refuelTime;
 
         const timer = setInterval(() => {
             timeLeft -= 1000;
             const minutes = Math.floor(timeLeft / (60 * 1000));
             const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-            document.getElementById("energy-refuel-timer").textContent = `${minutes}m ${seconds}s`;
+            document.getElementById("energy-refuel-timer").textContent = `Energy refuels in: ${minutes}m ${seconds}s`;
 
             if (timeLeft <= 0) {
                 clearInterval(timer);
                 document.getElementById("energy").textContent = "500/500";
-                saveUserData(parseInt(document.getElementById("balance").textContent, 10), 500);
+                saveUserDataToCookies(parseInt(document.getElementById("balance").textContent, 10), "500/500");
                 document.getElementById("energy-refuel-timer").textContent = "Energy fully refueled!";
             }
         }, 1000);
@@ -128,7 +124,7 @@ document.getElementById('tasks-tab').addEventListener('click', () => {
 });
 
 // Initial load
-window.addEventListener('load', async () => {
-    await loadUserData();
-    startEnergyRefuelTimer();
+window.addEventListener('load', () => {
+    loadUserDataFromCookies();  // Load user data from cookies on page load
+    startEnergyRefuelTimer();  // Start the energy refuel timer
 });
