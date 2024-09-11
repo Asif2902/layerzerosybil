@@ -1,7 +1,7 @@
 // Helper functions to set and get cookies
 function setCookie(name, value, days) {
     const d = new Date();
-    d.setTime(d.getTime() + (days*24*60*60*1000));
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
     const expires = "expires=" + d.toUTCString();
     document.cookie = name + "=" + value + ";" + expires + ";path=/";
 }
@@ -10,7 +10,7 @@ function getCookie(name) {
     const cname = name + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(';');
-    for(let i = 0; i < ca.length; i++) {
+    for (let i = 0; i < ca.length; i++) {
         let c = ca[i].trim();
         if (c.indexOf(cname) == 0) {
             return c.substring(cname.length, c.length);
@@ -62,19 +62,45 @@ document.getElementById('coin').addEventListener('click', async () => {
     }
 });
 
+// Mark task as completed in localStorage
+function markTaskCompleted(taskId) {
+    localStorage.setItem(`task_${taskId}`, "completed");
+}
+
+// Check if the task is already completed
+function isTaskCompleted(taskId) {
+    return localStorage.getItem(`task_${taskId}`) === "completed";
+}
+
+// Update task button UI if the task is completed
+function updateTaskButton(taskId, taskName) {
+    if (isTaskCompleted(taskId)) {
+        document.getElementById(taskId).textContent = `${taskName} Completed`;
+        document.getElementById(taskId).disabled = true;
+    }
+}
+
 // Task completion handling
 async function completeTask(taskId, taskName) {
-    document.getElementById(taskId).disabled = true;
+    if (!isTaskCompleted(taskId)) {
+        document.getElementById(taskId).disabled = true;
 
-    setTimeout(() => {
-        let balance = parseInt(document.getElementById("balance").textContent, 10);
-        balance += 5000;  // Add 5000 coins for completing the task
+        setTimeout(() => {
+            let balance = parseInt(document.getElementById("balance").textContent, 10);
+            balance += 5000;  // Add 5000 coins for completing the task
 
-        document.getElementById("balance").textContent = balance;
-        saveUserDataToCookies(balance, document.getElementById("energy").textContent);
+            document.getElementById("balance").textContent = balance;
+            saveUserDataToCookies(balance, document.getElementById("energy").textContent);
 
-        alert(`${taskName} completed! 5000 coins added to balance.`);
-    }, 5000);  // Simulate task completion after 5 seconds
+            alert(`${taskName} completed! 5000 coins added to balance.`);
+
+            // Mark task as completed and update UI
+            markTaskCompleted(taskId);
+            updateTaskButton(taskId, taskName);
+        }, 5000);  // Simulate task completion after 5 seconds
+    } else {
+        alert(`${taskName} has already been completed.`);
+    }
 }
 
 // Task actions
@@ -89,45 +115,6 @@ document.getElementById('join-telegram-task').addEventListener('click', () => {
 });
 
 // Energy refuel timer
-function startEnergyRefuelTimer() {
-    let energy = parseInt(document.getElementById("energy").textContent.split('/')[0], 10);
-
-    if (energy < 500) {
-        let refuelTime = 10 * 60 * 1000;  // 10 minutes to refuel to full
-        let timeLeft = refuelTime;
-
-        const timer = setInterval(() => {
-            timeLeft -= 1000;
-            const minutes = Math.floor(timeLeft / (60 * 1000));
-            const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-            document.getElementById("energy-refuel-timer").textContent = `Energy refuels in: ${minutes}m ${seconds}s`;
-
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                document.getElementById("energy").textContent = "500/500";
-                saveUserDataToCookies(parseInt(document.getElementById("balance").textContent, 10), "500/500");
-                document.getElementById("energy-refuel-timer").textContent = "Energy fully refueled!";
-            }
-        }, 1000);
-    }
-}
-
-// Initialize event listeners for navigation tabs
-document.getElementById('earn-tab').addEventListener('click', () => {
-    document.getElementById('earn-section').style.display = 'block';
-    document.getElementById('tasks-section').style.display = 'none';
-});
-
-document.getElementById('tasks-tab').addEventListener('click', () => {
-    document.getElementById('tasks-section').style.display = 'block';
-    document.getElementById('earn-section').style.display = 'none';
-});
-
-// Initial load
-window.addEventListener('load', () => {
-    loadUserDataFromCookies();  // Load user data from cookies on page load
-    startEnergyRefuelTimer();  // Start the energy refuel timer
-});
 function getRemainingTime() {
     const savedTime = localStorage.getItem('lastEnergyRefillTime');
     const currentTime = Date.now();
@@ -151,18 +138,46 @@ function startEnergyRefillTimer() {
 
         if (remainingTime > 0) {
             remainingTime--;
-            localStorage.setItem('lastEnergyRefillTime', Date.now());
         } else {
             clearInterval(timerInterval);
             document.getElementById('energy').textContent = '500/500'; // Reset energy
             localStorage.removeItem('lastEnergyRefillTime'); // Remove the time when refill completes
+            timerElement.textContent = "Energy fully refueled!";
         }
     };
 
-    const timerInterval = setInterval(updateTimer, 1000); // Update every second
+    if (remainingTime > 0) {
+        const timerInterval = setInterval(updateTimer, 1000); // Update every second
+    } else {
+        document.getElementById('energy').textContent = '500/500'; // Reset energy immediately if no time remains
+        timerElement.textContent = "Energy fully refueled!";
+    }
 }
 
+// Initialize event listeners for navigation tabs
+document.getElementById('earn-tab').addEventListener('click', () => {
+    document.getElementById('earn-section').style.display = 'block';
+    document.getElementById('tasks-section').style.display = 'none';
+});
+
+document.getElementById('tasks-tab').addEventListener('click', () => {
+    document.getElementById('tasks-section').style.display = 'block';
+    document.getElementById('earn-section').style.display = 'none';
+});
+
+// Initial load
 window.addEventListener('load', () => {
-    loadUserData(); // Load user data on page load
-    startEnergyRefillTimer(); // Start the energy refill timer
+    loadUserDataFromCookies();  // Load user data from cookies on page load
+    startEnergyRefillTimer();  // Start the energy refuel timer
+
+    // Check task status and update UI on load
+    updateTaskButton('follow-twitter-task', 'Twitter Follow');
+    updateTaskButton('join-telegram-task', 'Telegram Join');
+
+    const savedTime = localStorage.getItem('lastEnergyRefillTime');
+    if (!savedTime) {
+        // Save the current timestamp if no saved time
+        localStorage.setItem('lastEnergyRefillTime', Date.now());
+    }
+    startEnergyRefillTimer();  // Start the energy refill timer
 });
