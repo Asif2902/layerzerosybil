@@ -19,10 +19,12 @@ function getCookie(name) {
     return "";
 }
 
-// Function to load balance and energy from cookies or set defaults
+// Function to load balance, energy, and task status from cookies
 function loadUserDataFromCookies() {
     let balance = getCookie('balance');
     let energy = getCookie('energy');
+    let twitterTaskCompleted = getCookie('twitterTaskCompleted');
+    let telegramTaskCompleted = getCookie('telegramTaskCompleted');
 
     if (!balance) {
         balance = 0;  // default balance
@@ -35,12 +37,29 @@ function loadUserDataFromCookies() {
 
     document.getElementById("balance").textContent = balance;
     document.getElementById("energy").textContent = energy;
+
+    // Check if tasks are already completed and disable the buttons if they are
+    if (twitterTaskCompleted === "true") {
+        document.getElementById("follow-twitter-task").disabled = true;
+    }
+    if (telegramTaskCompleted === "true") {
+        document.getElementById("join-telegram-task").disabled = true;
+    }
 }
 
-// Save the balance and energy to cookies
+// Save the balance, energy, and task status to cookies
 function saveUserDataToCookies(balance, energy) {
     setCookie('balance', balance, 7);  // Save balance for 7 days
     setCookie('energy', energy, 7);  // Save energy for 7 days
+}
+
+// Save task completion status to cookies
+function markTaskCompleted(task) {
+    if (task === 'twitter') {
+        setCookie('twitterTaskCompleted', 'true', 7);  // Save Twitter task as completed
+    } else if (task === 'telegram') {
+        setCookie('telegramTaskCompleted', 'true', 7);  // Save Telegram task as completed
+    }
 }
 
 // Handle "Tap to Earn" functionality
@@ -63,7 +82,7 @@ document.getElementById('coin').addEventListener('click', async () => {
 });
 
 // Task completion handling
-async function completeTask(taskId, taskName) {
+async function completeTask(taskId, taskName, taskCookie) {
     document.getElementById(taskId).disabled = true;
 
     setTimeout(() => {
@@ -74,18 +93,19 @@ async function completeTask(taskId, taskName) {
         saveUserDataToCookies(balance, document.getElementById("energy").textContent);
 
         alert(`${taskName} completed! 5000 coins added to balance.`);
+        markTaskCompleted(taskCookie);  // Mark the task as completed in cookies
     }, 5000);  // Simulate task completion after 5 seconds
 }
 
 // Task actions
 document.getElementById('follow-twitter-task').addEventListener('click', () => {
     window.open('https://twitter.com', '_blank');
-    completeTask('follow-twitter-task', 'Twitter Follow');
+    completeTask('follow-twitter-task', 'Twitter Follow', 'twitter');
 });
 
 document.getElementById('join-telegram-task').addEventListener('click', () => {
     window.open('https://t.me', '_blank');
-    completeTask('join-telegram-task', 'Telegram Join');
+    completeTask('join-telegram-task', 'Telegram Join', 'telegram');
 });
 
 // Energy refuel timer
