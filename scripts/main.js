@@ -19,12 +19,10 @@ function getCookie(name) {
     return "";
 }
 
-// Function to load balance, energy, and task status from cookies
+// Function to load balance and energy from cookies or set defaults
 function loadUserDataFromCookies() {
     let balance = getCookie('balance');
     let energy = getCookie('energy');
-    let twitterTaskCompleted = getCookie('twitterTaskCompleted');
-    let telegramTaskCompleted = getCookie('telegramTaskCompleted');
 
     if (!balance) {
         balance = 0;  // default balance
@@ -37,29 +35,12 @@ function loadUserDataFromCookies() {
 
     document.getElementById("balance").textContent = balance;
     document.getElementById("energy").textContent = energy;
-
-    // Check if tasks are already completed and disable the buttons if they are
-    if (twitterTaskCompleted === "true") {
-        document.getElementById("follow-twitter-task").disabled = true;
-    }
-    if (telegramTaskCompleted === "true") {
-        document.getElementById("join-telegram-task").disabled = true;
-    }
 }
 
-// Save the balance, energy, and task status to cookies
+// Save the balance and energy to cookies
 function saveUserDataToCookies(balance, energy) {
     setCookie('balance', balance, 7);  // Save balance for 7 days
     setCookie('energy', energy, 7);  // Save energy for 7 days
-}
-
-// Save task completion status to cookies
-function markTaskCompleted(task) {
-    if (task === 'twitter') {
-        setCookie('twitterTaskCompleted', 'true', 7);  // Save Twitter task as completed
-    } else if (task === 'telegram') {
-        setCookie('telegramTaskCompleted', 'true', 7);  // Save Telegram task as completed
-    }
 }
 
 // Handle "Tap to Earn" functionality
@@ -82,7 +63,7 @@ document.getElementById('coin').addEventListener('click', async () => {
 });
 
 // Task completion handling
-async function completeTask(taskId, taskName, taskCookie) {
+async function completeTask(taskId, taskName) {
     document.getElementById(taskId).disabled = true;
 
     setTimeout(() => {
@@ -93,19 +74,18 @@ async function completeTask(taskId, taskName, taskCookie) {
         saveUserDataToCookies(balance, document.getElementById("energy").textContent);
 
         alert(`${taskName} completed! 5000 coins added to balance.`);
-        markTaskCompleted(taskCookie);  // Mark the task as completed in cookies
     }, 5000);  // Simulate task completion after 5 seconds
 }
 
 // Task actions
 document.getElementById('follow-twitter-task').addEventListener('click', () => {
     window.open('https://twitter.com', '_blank');
-    completeTask('follow-twitter-task', 'Twitter Follow', 'twitter');
+    completeTask('follow-twitter-task', 'Twitter Follow');
 });
 
 document.getElementById('join-telegram-task').addEventListener('click', () => {
     window.open('https://t.me', '_blank');
-    completeTask('join-telegram-task', 'Telegram Join', 'telegram');
+    completeTask('join-telegram-task', 'Telegram Join');
 });
 
 // Energy refuel timer
@@ -147,4 +127,42 @@ document.getElementById('tasks-tab').addEventListener('click', () => {
 window.addEventListener('load', () => {
     loadUserDataFromCookies();  // Load user data from cookies on page load
     startEnergyRefuelTimer();  // Start the energy refuel timer
+});
+function getRemainingTime() {
+    const savedTime = localStorage.getItem('lastEnergyRefillTime');
+    const currentTime = Date.now();
+    
+    if (savedTime) {
+        const elapsedTime = Math.floor((currentTime - parseInt(savedTime, 10)) / 1000); // Elapsed time in seconds
+        return Math.max(0, 600 - elapsedTime); // 10 minutes = 600 seconds, calculate remaining time
+    }
+    return 600; // Full 10 minutes if no time saved
+}
+
+function startEnergyRefillTimer() {
+    const timerElement = document.getElementById('timer');
+    let remainingTime = getRemainingTime();
+
+    const updateTimer = () => {
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+
+        timerElement.textContent = `Energy refuels in: ${minutes}m ${seconds}s`;
+
+        if (remainingTime > 0) {
+            remainingTime--;
+            localStorage.setItem('lastEnergyRefillTime', Date.now());
+        } else {
+            clearInterval(timerInterval);
+            document.getElementById('energy').textContent = '500/500'; // Reset energy
+            localStorage.removeItem('lastEnergyRefillTime'); // Remove the time when refill completes
+        }
+    };
+
+    const timerInterval = setInterval(updateTimer, 1000); // Update every second
+}
+
+window.addEventListener('load', () => {
+    loadUserData(); // Load user data on page load
+    startEnergyRefillTimer(); // Start the energy refill timer
 });
