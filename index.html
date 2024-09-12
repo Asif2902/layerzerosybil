@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="styles/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js" defer></script>
     <script
-    src="https://cdn.jsdelivr.net/npm/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <script
-    src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest/dist/tonconnect.min.js"></script>
+    src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 </head>
 <body>
     <div id="app">
@@ -19,7 +17,8 @@
                 <img src="assets/logo.png" alt="Coin Logo" id="coin-logo">
                 <span id="balance">0</span>
             </div>
-            <button id="connect-ton-wallet">Connect Wallet</button>
+          <button id="connect-ton-wallet">Connect Wallet</button>
+
         </div>
         <div id="energy-section">
             <span id="energy">500/500 ⚡</span>
@@ -48,37 +47,10 @@
             </button>
         </div>
     </div>
-
-    <script>
-        // Initialize TonConnect
-        const tonConnect = new TonConnect();
-        const tonConnectUI = new TonConnectUI(tonConnect, {
-            bridgeUrl: 'https://bridge.tonconnect.dev',  // Bridge URL for handling connections
-            manifestUrl: 'https://layerzerosybil.vercel.app/tonconnect-manifest.json'  // URL to your manifest
-        });
-
-        // Function to connect TON Wallet
-        async function connectTonWallet() {
-            try {
-                // Opens the TON Connect UI for wallet selection
-                const selectedWallet = await tonConnectUI.connectWallet();
-
-                // If a wallet is selected, show the address
-                if (selectedWallet) {
-                    const address = selectedWallet.account.address;
-                    document.getElementById('connect-ton-wallet').textContent = address;
-                    alert("Connected to TON Wallet: " + address);
-                } else {
-                    alert("No wallet selected");
-                }
-            } catch (error) {
-                console.error("Error connecting to TON Wallet:", error);
-                alert("Error connecting to TON Wallet. Check console for details.");
-            }
-        }
-
-        // Add event listener for the "Connect Wallet" button
-        document.getElementById('connect-ton-wallet').addEventListener('click', connectTonWallet);
-    </script>
+    <script src="scripts/ton-wallet.js"></script>
+    <script src="scripts/main.js"></script>
+    <script
+    src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest/dist/tonconnect.min.js"></script>
+    
 </body>
 </html>
