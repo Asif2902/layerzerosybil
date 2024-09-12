@@ -1,36 +1,27 @@
-// Import the TonConnect SDK (only needed if using a build tool)
-import { TonConnect } from "@tonconnect/sdk";
+// Import the TonConnect SDK (if using a module bundler)
+import { TonConnectUI, TonConnect } from "@tonconnect/ui";
 
-// Initialize TonConnect instance
-const tonConnect = new TonConnect({
-    manifestUrl: "https://layerzerosybil.vercel.app/tonconnect-manifest.json" // Replace with your actual manifest file URL
+// Initialize TON Connect and UI
+const tonConnect = new TonConnect();
+const tonConnectUI = new TonConnectUI(tonConnect, {
+    // Specify required permissions here if needed
+    bridgeUrl: 'https://bridge.tonconnect.dev',
+    manifestUrl: 'https://layerzerosybil.vercel.app/tonconnect-manifest.json'
 });
 
-// Manifest setup in JSON (required by TON Connect)
-const manifest = {
-    url: "https://layerzerosybil.vercel.app", // Your dApp URL
-    name: "TapSwap",
-    icons: ["https://layerzerosybil.vercel.app/assets/logo.png"], // Replace with your actual icon URL
-};
-
-// Function to connect to TON Wallet
+// Function to connect TON Wallet
 async function connectTonWallet() {
     try {
-        // Open the connection dialog (users will select their wallet)
-        const walletsList = await tonConnect.getWallets();
-        
-        if (walletsList.length > 0) {
-            await tonConnect.connect({ universalLink: walletsList[0].universalLink });
-        }
+        // Opens the TON Connect wallet selection UI
+        const selectedWallet = await tonConnectUI.connectWallet();
 
-        const connectedWallet = tonConnect.wallet;
-        
-        if (connectedWallet) {
-            const address = connectedWallet.account.address;
+        // Check if wallet was selected
+        if (selectedWallet) {
+            const address = selectedWallet.account.address;
             document.getElementById('connect-ton-wallet').textContent = address;
             alert("Connected to TON Wallet: " + address);
         } else {
-            alert("No wallet connected");
+            alert("No wallet selected");
         }
     } catch (error) {
         console.error("Error connecting to TON Wallet:", error);
@@ -38,5 +29,5 @@ async function connectTonWallet() {
     }
 }
 
-// Add event listener to the Connect button
+// Add event listener for the Connect Wallet button
 document.getElementById('connect-ton-wallet').addEventListener('click', connectTonWallet);
