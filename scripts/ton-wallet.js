@@ -1,33 +1,35 @@
-// Import the TonConnect SDK (if using a module bundler)
-import { TonConnectUI, TonConnect } from "@tonconnect/ui";
-
-// Initialize TON Connect and UI
-const tonConnect = new TonConnect();
-const tonConnectUI = new TonConnectUI(tonConnect, {
-    // Specify required permissions here if needed
-    bridgeUrl: 'https://bridge.tonconnect.dev',
-    manifestUrl: 'https://layerzerosybil.vercel.app/tonconnect-manifest.json'
+// Initialize TON Connect
+const tonConnect = new TonConnect({
+    manifestUrl: 'https://layerzerosybil.vercel.app/tonconnect-manifest.json' // Replace with your manifest URL
 });
 
-// Function to connect TON Wallet
-async function connectTonWallet() {
-    try {
-        // Opens the TON Connect wallet selection UI
-        const selectedWallet = await tonConnectUI.connectWallet();
+// Select the "Connect Wallet" button
+const connectButton = document.getElementById("connect-ton-wallet");
 
-        // Check if wallet was selected
-        if (selectedWallet) {
-            const address = selectedWallet.account.address;
-            document.getElementById('connect-ton-wallet').textContent = address;
-            alert("Connected to TON Wallet: " + address);
-        } else {
-            alert("No wallet selected");
+// Handle wallet connection
+connectButton.addEventListener("click", async () => {
+    try {
+        // Prompt user to connect wallet
+        const connection = await tonConnect.connectWallet();
+        if (connection) {
+            console.log('Wallet connected:', connection);
+
+            // Update button text to show wallet address
+            connectButton.textContent = `Connected: ${connection.walletAddress}`;
+
+            // You can also display the balance if you fetch it
+            // For example:
+            const balance = await tonConnect.getBalance(connection.walletAddress);
+            document.getElementById('balance').textContent = balance + ' TON';
         }
     } catch (error) {
-        console.error("Error connecting to TON Wallet:", error);
-        alert("Error connecting to TON Wallet. Check console for details.");
+        console.error('Connection failed', error);
     }
-}
+});
 
-// Add event listener for the Connect Wallet button
-document.getElementById('connect-ton-wallet').addEventListener('click', connectTonWallet);
+// Disconnect logic (if needed)
+function disconnectWallet() {
+    tonConnect.disconnect();
+    connectButton.textContent = 'Connect Wallet';
+    document.getElementById('balance').textContent = '0';
+}
