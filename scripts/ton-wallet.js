@@ -1,7 +1,4 @@
-import { TonConnectUI } from "@tonconnect/ui";
-import React, { useState } from "react";
 
-//Instantiate TonConnect
 const tonConnectUI = new TonConnectUI({
   manifestUrl: "https://layerzerosybil.vercel.app/tonconnect-manifest.json",
   buttonRootId: "<connect-ton-wallet>",
