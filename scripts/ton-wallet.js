@@ -1,43 +1,96 @@
-// Initialize TON Connect
-const tonConnect = new TonConnect({
-    manifestUrl: 'https://layerzerosybil.vercel.app/tonconnect-manifest.json' // Replace with your hosted manifest file URL
+import { TonConnectUI } from "@tonconnect/ui";
+import React, { useState } from "react";
+
+//Instantiate TonConnect
+const tonConnectUI = new TonConnectUI({
+  manifestUrl: "https://layerzerosybil.vercel.app/tonconnect-manifest.json",
+  buttonRootId: "<connect-ton-wallet>",
+  /**
+   * Add custom wallet to wallets list
+   */
+  walletsListConfiguration: {
+    includeWallets: [
+      {
+        name: "Bitget Wallet",
+        appName: "bitgetTonWallet",
+        imageUrl:
+          "https://raw.githubusercontent.com/bitkeepwallet/download/main/logo/png/bitget%20wallet_logo_iOS.png",
+        deepLink: "bitkeep://",
+        universalLink: "https://bkcode.vip/ton-connect",
+        bridgeUrl: "https://bridge.tonapi.io/bridge",
+        platforms: ["ios", "android", "chrome"],
+      },
+    ],
+  },
+  // connector: "your tonConnect instance",
+  //...
 });
 
-// Select the "Connect Wallet" button
-const connectButton = document.getElementById("connect-ton-wallet");
+//Change options if needed
+tonConnectUI.uiOptions = {
+  language: "en",
+  uiPreferences: {
+    theme: THEME.DARK,
+  },
+};
 
-// Handle wallet connection
-connectButton.addEventListener("click", async () => {
-    try {
-        const isConnected = tonConnect.wallet;
-        if (isConnected) {
-            console.log('Wallet already connected:', isConnected);
+//Get wallet list
+const walletsList = await tonConnectUI.getWallets();
+/* walletsList is 
+{
+    name: string;
+    imageUrl: string;
+    tondns?: string;
+    aboutUrl: string;
+    universalLink?: string;
+    deepLink?: string;
+    bridgeUrl?: string;
+    jsBridgeKey?: string;
+    injected?: boolean; // true if this wallet is injected to the webpage
+    embedded?: boolean; // true if the dapp is opened inside this wallet's browser
+}[] 
+ */
 
-            // Update button text to show wallet address
-            connectButton.textContent = `Connected: ${isConnected.account.address}`;
-            return;
-        }
+//Open wallet selection list
+await tonConnectUI.openModal();
 
-        // Prompt user to connect wallet
-        const wallet = await tonConnect.connectWallet();
-        if (wallet) {
-            console.log('Wallet connected:', wallet);
+//Close wallet selection list
+tonConnectUI.closeModal();
 
-            // Update button text to show wallet address
-            connectButton.textContent = `Connected: ${wallet.account.address}`;
+//Get the current modal status
+const currentModalState = tonConnectUI.modalState;
 
-            // Optionally, you can also fetch and display the user's balance
-            const balance = await tonConnect.getBalance(wallet.account.address);
-            document.getElementById('balance').textContent = balance + ' TON';
-        }
-    } catch (error) {
-        console.error('Connection failed', error);
-    }
+//Subscribe to modal window state changes
+const unsubscribeModal = tonConnectUI.onModalStateChange(
+  (state: WalletsModalState) => {
+    // update state/reactive variables to show updates in the ui
+    // state.status will be 'opened' or 'closed'
+    // if state.status is 'closed', you can check state.closeReason to find out the reason
+  }
+);
+
+//Specify the connection wallet
+await tonConnectUI.openSingleWalletModal("bitgetTonWallet");
+
+tonConnectUI.closeSingleWalletModal();
+
+const unsubscribe = tonConnectUI.onSingleWalletModalStateChange((state) => {
+  console.log("Modal state changed:", state);
 });
 
-// Optionally add disconnect logic
-function disconnectWallet() {
-    tonConnect.disconnect();
-    connectButton.textContent = 'Connect Wallet';
-    document.getElementById('balance').textContent = '0';
-}
+// Call `unsubscribe` when you want to stop listening to the state changes
+unsubscribe();
+
+//Get the currently connected Wallet and WalletInfo
+const currentWallet = tonConnectUI.wallet;
+const currentWalletInfo = tonConnectUI.walletInfo;
+const currentAccount = tonConnectUI.account;
+const currentIsConnectedStatus = tonConnectUI.connected;
+
+//Subscribe to connection status changes
+const unsubscribe = tonConnectUI.onStatusChange((walletAndwalletInfo) => {
+  // update state/reactive variables to show updates in the ui
+});
+
+//disconnect
+await tonConnectUI.disconnect();
